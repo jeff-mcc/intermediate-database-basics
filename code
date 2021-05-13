@@ -1,0 +1,191 @@
+--Practice Joins--
+
+1. Get all invoices where the unit_price on the invoice_line is greater than $0.99.
+
+determined how many distint invoice_id's existed > 0.99 in price (30 total)
+-- SELECT COUNT(DISTINCT invoice_id) FROM invoice_line
+-- WHERE unit_price > 0.99;
+
+obtained invoices matching the invoice_id where the invoice_line price was > 0.99 and verified that the count was the same as determined previously.  Join was not needed to answer the question as it was written as the invoice line was not needed or requested (the question should not assume the reader acknowledges a need for line item information without explicitly stating it).
+-- SELECT * FROM invoice
+-- WHERE invoice_id IN (
+-- 	SELECT invoice_id from invoice_line
+--   WHERE unit_price > 0.99
+-- );
+
+if you really want me to use a join statement and include all line items instead, seeing that the first question to the next section is identical...
+-- SELECT * FROM invoice i
+-- JOIN invoice_line il ON i.invoice_id = il.invoice_id
+-- WHERE il.unit_price > 0.99;
+
+
+2. Get the invoice_date, customer first_name and last_name, and total from all invoices.
+
+-- SELECT i.invoice_date, c.first_name, c.last_name, i.total FROM invoice i
+-- JOIN customer c ON i.customer_id = c.customer_id;
+
+
+3. Get the customer first_name and last_name and the support rep's first_name and last_name from all customers.
+Support reps are on the employee table.
+
+SELECT c.first_name, c.last_name, e.first_name, e.last_name FROM customer c
+JOIN employee e ON c.support_rep_id = e.employee_id;
+
+
+4. Get the album title and the artist name from all albums.
+
+-- SELECT album.title, artist.name FROM album
+-- JOIN artist ON album.artist_id = artist.artist_id;
+
+
+5. Get all playlist_track track_ids where the playlist name is Music.
+
+-- SELECT t.track_id FROM playlist_track t
+-- JOIN playlist p ON t.playlist_id = p.playlist_id WHERE p.name = 'Music';
+
+
+6. Get all track names for playlist_id 5.
+
+-- SELECT t.name FROM playlist_track p
+-- JOIN track t ON p.track_id = t.track_id
+-- WHERE p.playlist_id = 5;
+
+
+7. Get all track names and the playlist name that they're on ( 2 joins ).
+
+-- SELECT t.name, p.name FROM playlist_track pt
+-- JOIN track t ON pt.track_id = t.track_id
+-- JOIN playlist p ON pt.playlist_id = p.playlist_id;
+
+8. Get all track names and album titles that are the genre Alternative & Punk ( 2 joins ).
+
+-- SELECT t.name, a.title FROM track t
+-- JOIN album a ON t.album_id = a.album_id
+-- JOIN genre g ON t.genre_id = g.genre_id
+-- WHERE g.name = 'Alternative & Punk';
+
+
+Black Diamond -- Get all tracks on the playlist(s) called Music and show their name, genre name, album name, and artist name.
+At least 5 joins.
+
+-- SELECT t.name, g.name, al.title, ar.name FROM track t
+-- JOIN genre g ON t.genre_id = g.genre_id
+-- JOIN album al ON t.album_id = al.album_id
+-- JOIN artist ar ON al.artist_id = ar.artist_id
+-- JOIN playlist_track pt ON t.track_id = pt.track_id
+-- JOIN playlist p ON pt.playlist_id = p.playlist_id
+-- WHERE p.name = 'Music';
+
+
+
+--Practice nested queries--
+
+1. Get all invoices where the unit_price on the invoice_line is greater than $0.99.
+
+-- SELECT * FROM invoice
+-- WHERE invoice_id IN (
+-- 	SELECT invoice_id from invoice_line
+--   WHERE unit_price > 0.99
+-- );
+
+
+2. Get all playlist tracks where the playlist name is Music.
+
+-- SELECT * FROM playlist_track
+-- WHERE playlist_id IN (
+--   SELECT playlist_id FROM playlist
+--   WHERE name = 'Music'
+-- );
+
+
+3. Get all track names for playlist_id 5.
+
+-- SELECT name FROM track
+-- WHERE track_id IN (
+--   SELECT track_id FROM playlist_track
+--   WHERE playlist_id = 5
+-- );
+
+
+4. Get all tracks where the genre is Comedy.
+
+-- SELECT * FROM track
+-- WHERE genre_id IN (
+--   SELECT genre_id FROM genre
+--   WHERE name = 'Comedy'
+-- );
+
+
+5. Get all tracks where the album is Fireball.
+
+-- SELECT * FROM track
+-- WHERE album_id IN (
+--   SELECT album_id FROM album
+--   WHERE title = 'Fireball'
+-- );
+
+
+6. Get all tracks for the artist Queen ( 2 nested subqueries ).
+
+-- SELECT * FROM track
+-- WHERE album_id IN (
+--   SELECT album_id FROM album
+--   WHERE artist_id IN (
+--     SELECT artist_id FROM artist
+--     WHERE name = 'Queen'
+--   )
+-- );
+
+
+
+--Practice updating Rows--
+
+1. Find all customers with fax numbers and set those numbers to null.
+
+-- UPDATE customer
+-- SET fax = null
+-- WHERE fax IS NOT NULL;
+-- SELECT * FROM customer;
+
+
+2. Find all customers with no company (null) and set their company to "Self".
+
+-- UPDATE customer
+-- SET company = 'Self'
+-- WHERE company IS NULL;
+-- SELECT * FROM customer;
+
+
+3. Find the customer Julia Barnett and change her last name to Thompson.
+
+-- UPDATE customer
+-- SET last_name = 'Thompson'
+-- WHERE first_name = 'Julia' AND last_name = 'Barnett';
+
+
+4. Find the customer with this email luisrojas@yahoo.cl and change his support rep to 4.
+
+-- UPDATE customer
+-- SET support_rep_id = 4
+-- WHERE email = 'luisrojas@yahoo.cl';
+
+
+5. Find all tracks that are the genre Metal and have no composer. Set the composer to "The darkness around us".
+
+-- UPDATE track
+-- SET composer = 'The darkness around us'
+-- WHERE composer IS NULL AND genre_id IN (
+--   SELECT genre_id FROM genre
+--   WHERE name = 'Metal'
+-- );
+
+6. Refresh your page to remove all database changes.
+
+--Done, although I doubt you actually expected me to answer this question, while I also doubt that you are actually going to read this since the assignment is not graded... oh, well.
+
+
+
+--Group by--
+
+1. Find a count of how many tracks there are per genre. Display the genre name with the count.
+
